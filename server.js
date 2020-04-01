@@ -1,4 +1,4 @@
-require('dotenv').config({path: __dirname + '/config.env'})
+require('dotenv').config({path: __dirname + '/config.env'}) //Load enviromental variables
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');

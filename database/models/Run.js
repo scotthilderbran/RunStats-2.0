@@ -7,29 +7,21 @@ const Run = db.define('run',{
         primaryKey: true, 
         autoIncrement : true
     },
-    email: {
-        type: Sequelize.STRING,
+    distance: {
+        type: Sequelize.DECIMAL(6,3),
         allowNull: false
     },
-    password: {
-        type: Sequelize.STRING,
+    time: {
+        type: Sequelize.DECIMAL(7,2),
         allowNull: false
     },
-    userFName: {
-        type: Sequelize.STRING,
+    runnerid: {
+        type: Sequelize.INTEGER,
         allowNull: false
-    },
-    userLName: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    sex: {
-        type: Sequelize.BOOLEAN,
-        allowNull: true
     }
     },
     {
         freezeTableName: true // Model tableName will be the same as the model name
       }
     )
-module.exports = User;
+module.exports = Run;
