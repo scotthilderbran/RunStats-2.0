@@ -8,31 +8,35 @@ const User = db.define(
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     email: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     userFName: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     userLName: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     sex: {
       type: Sequelize.BOOLEAN,
-      allowNull: true
-    }
+      allowNull: true,
+    },
+    age: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+    },
   },
   {
-    freezeTableName: true // Model tableName will be the same as the model name
+    freezeTableName: true, // Model tableName will be the same as the model name
   }
 );
 User.beforeSave((user, options) => {
@@ -44,8 +48,8 @@ User.beforeSave((user, options) => {
     );
   }
 });
-User.prototype.comparePassword = function(passw, cb) {
-  bcrypt.compare(passw, this.password, function(err, isMatch) {
+User.prototype.comparePassword = function (passw, cb) {
+  bcrypt.compare(passw, this.password, function (err, isMatch) {
     if (err) {
       return cb(err);
     }

@@ -1,27 +1,37 @@
-const Sequelize = require('sequelize');
-const db = require('../config/database');
+const Sequelize = require("sequelize");
+const db = require("../config/database");
 
-const Run = db.define('run',{
-    id: { 
-        type: Sequelize.INTEGER, 
-        primaryKey: true, 
-        autoIncrement : true
+const Run = db.define(
+  "run",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     distance: {
-        type: Sequelize.DECIMAL(6,3),
-        allowNull: false
+      type: Sequelize.DECIMAL(6, 3),
+      allowNull: false,
+    },
+    note: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    date: {
+      type: Sequelize.DATEONLY,
+      allowNull: true,
     },
     time: {
-        type: Sequelize.DECIMAL(7,2),
-        allowNull: false
+      type: Sequelize.DECIMAL(7, 2),
+      allowNull: false,
     },
     runnerid: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-    }
+      type: Sequelize.INTEGER,
+      allowNull: false,
     },
-    {
-        freezeTableName: true // Model tableName will be the same as the model name
-      }
-    )
+  },
+  {
+    freezeTableName: true, // Model tableName will be the same as the model name
+  }
+);
 module.exports = Run;

@@ -17,6 +17,7 @@ router.post("/register", function (req, res) {
       userFName: req.body.fName,
       userLName: req.body.lName,
       sex: req.body.sex,
+      age: req.body.age,
     })
       .then((user) => {
         let token = jwt.sign(
@@ -102,8 +103,45 @@ router.get(
             email: user.email,
             userFName: user.userFName,
             userLName: user.userLName,
+            sex: user.sex,
+            age: user.age,
           });
           res.status(200);
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return res.status(403).send({ success: false, msg: "Unauthorized." });
+    }
+  }
+);
+
+router.post(
+  "/update",
+  passport.authenticate("jwt", { session: false }),
+  function (req, res) {
+    console.log("PROTECTED - user/update POST request");
+    var token = getToken(req.headers);
+    if (token) {
+      decoded = jwt.verify(token, process.env.AUTH_SECRET);
+      const userId = decoded.id;
+      console.log(req.body);
+      console.log(userId);
+      User.update(
+        {
+          email: req.body.email,
+          password: req.body.password,
+          userFName: req.body.fName,
+          userLName: req.body.lName,
+          sex: req.body.sex,
+          age: req.body.age,
+        },
+        {
+          where: { id: userId },
+        }
+      )
+        .then(() => {
+          console.log("here");
+          res.sendStatus(200);
         })
         .catch((err) => console.log(err));
     } else {
