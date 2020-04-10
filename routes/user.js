@@ -12,30 +12,44 @@ router.post("/register", function (req, res) {
   if (!req.body.email || !req.body.password) {
     res.status(400).send({ msg: "Please pass username and password." });
   } else {
-    User.create({
-      email: req.body.email,
-      password: req.body.password,
-      userFName: req.body.fName,
-      userLName: req.body.lName,
-      sex: req.body.sex,
-      age: req.body.age,
-    })
-      .then((user) => {
-        let token = jwt.sign(
-          JSON.parse(JSON.stringify(user)),
-          process.env.AUTH_SECRET,
-          { expiresIn: "4h" }
-        );
-        jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
-          console.log(err, data);
+    User.findOne({
+      where: {
+        id: userId,
+      },
+      raw: true,
+    }).then((user) => {
+      if (!user) {
+        User.create({
+          email: req.body.email.toLowerCase().replace(/\s/g, ""),
+          password: req.body.password,
+          userFName: req.body.fName,
+          userLName: req.body.lName,
+          sex: req.body.sex,
+          age: req.body.age,
+        })
+          .then((user) => {
+            let token = jwt.sign(
+              JSON.parse(JSON.stringify(user)),
+              process.env.AUTH_SECRET,
+              { expiresIn: "4h" }
+            );
+            jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
+              console.log(err, data);
+            });
+            console.log("User created");
+            res.json({ success: true, token: "JWT " + token });
+          })
+          .catch((error) => {
+            console.log(error);
+            res.status(400).send(error);
+          });
+      } else {
+        res.status(401).send({
+          success: false,
+          message: "Email in use",
         });
-        console.log("User created");
-        res.json({ success: true, token: "JWT " + token });
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(400).send(error);
-      });
+      }
+    });
   }
 });
 
@@ -43,7 +57,7 @@ router.post("/login", function (req, res) {
   console.log("PUBLIC - user/login POST request");
   User.findOne({
     where: {
-      email: req.body.email,
+      email: req.body.email.toLowerCase().replace(/\s/g, ""),
     },
   })
     .then((user) => {
@@ -74,7 +88,7 @@ router.post("/login", function (req, res) {
         } else {
           res.status(401).send({
             success: false,
-            msg: "Authentication failed. Wrong password.",
+            message: "Authentication failed. Wrong email/password.",
           });
         }
       });
@@ -129,7 +143,7 @@ router.post(
       console.log(userId);
       User.update(
         {
-          email: req.body.email,
+          email: req.body.email.toLowerCase().replace(/\s/g, ""),
           password: req.body.password,
           userFName: req.body.fName,
           userLName: req.body.lName,
