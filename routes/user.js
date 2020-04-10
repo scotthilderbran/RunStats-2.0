@@ -7,6 +7,7 @@ require("../passport")(passport);
 const getToken = require("../helpers/getToken");
 
 router.post("/register", function (req, res) {
+  //Add data to find if user email exists already or not and return it
   console.log("PUBLIC - user/register POST request");
   if (!req.body.email || !req.body.password) {
     res.status(400).send({ msg: "Please pass username and password." });

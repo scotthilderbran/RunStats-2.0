@@ -1,6 +1,8 @@
 # RunStats 2.0 Backend
 
-API to power RunStats 2.0 client
+Author: Scott Hilderbran
+
+NodeJS API to power RunStats Client. Server manages PostgreSQL database with user and run information.
 
 ## Technologies used
 
@@ -17,7 +19,7 @@ API to power RunStats 2.0 client
 
 - _POST_
   - Create a new user
-  - Parameters
+  - Body
     - email : String (**required**)
     - password : String (**required**)
     - userFName: String (**required**)
@@ -37,6 +39,16 @@ API to power RunStats 2.0 client
     - Returns status 200 , jwt and user object if successful, status 400 if not
 
 ### Private Endpoints (JWT in authorization header)
+
+#### /user/update
+
+- _POST_
+  - Update user profile
+  - Body
+    - email : String (**required**)
+    - password : String (**required**)
+  - Response
+    - Returns status 200 , jwt and user object if successful, status 400 if not
 
 #### /run/getAllRuns
 
