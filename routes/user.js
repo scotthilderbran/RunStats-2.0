@@ -94,8 +94,8 @@ router.post("/login", function (req, res) {
               token: "JWT " + token,
               user: {
                 email: user.email,
-                userFName: user.userFName,
-                userLName: user.userLName,
+                user_f_name: user.userFName,
+                user_l_name: user.userLName,
               },
             });
           } else {
@@ -128,8 +128,8 @@ router.get(
         .then((user) => {
           res.json({
             email: user.email,
-            userFName: user.userFName,
-            userLName: user.userLName,
+            user_f_ame: user.userFName,
+            user_l_name: user.userLName,
             sex: user.sex,
             age: user.age,
           });
@@ -170,8 +170,8 @@ router.post(
               {
                 email: req.body.email.toLowerCase().replace(/\s/g, ""),
                 password: req.body.password,
-                userFName: req.body.fName,
-                userLName: req.body.lName,
+                user_f_name: req.body.fName,
+                user_l_name: req.body.lName,
                 sex: req.body.sex,
                 age: req.body.age,
               },
@@ -182,8 +182,8 @@ router.post(
               .then((user) => {
                 res.json({
                   email: user.email,
-                  userFName: user.userFName,
-                  userLName: user.userLName,
+                  user_f_name: user.userFName,
+                  user_l_name: user.userLName,
                   sex: user.sex,
                   age: user.age,
                 });

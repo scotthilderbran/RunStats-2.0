@@ -36,7 +36,7 @@ router.post(
               Run.findOrCreate({
                 where: { strava_run_id: runs[i].id },
                 defaults: {
-                  runnerid: userId,
+                  runner_id: userId,
                   note: runs[i].name,
                   distance: (runs[i].distance * 0.000621371192).toFixed(3),
                   time: (runs[i].moving_time / 60).toFixed(3),

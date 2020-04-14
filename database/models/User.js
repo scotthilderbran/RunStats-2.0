@@ -18,11 +18,11 @@ const User = db.define(
       type: Sequelize.STRING,
       allowNull: false,
     },
-    userFName: {
+    user_f_name: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    userLName: {
+    user_l_name: {
       type: Sequelize.STRING,
       allowNull: false,
     },

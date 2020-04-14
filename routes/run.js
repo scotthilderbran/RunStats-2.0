@@ -17,7 +17,7 @@ router.get(
       const userId = decoded.id;
       Run.findAll({
         where: {
-          runnerid: userId,
+          runner_id: userId,
         },
         raw: true,
       })
@@ -51,7 +51,7 @@ router.post(
         distance: req.body.distance,
         time: req.body.time,
         date: req.body.date,
-        runnerid: userId,
+        runner_id: userId,
       })
         .then((run) => {
           console.log("Adding following run:");
@@ -79,7 +79,7 @@ router.post(
       Run.destroy({
         where: {
           id: req.body.id,
-          runnerid: userId,
+          runner_id: userId,
         },
       })
         .then(() => {
@@ -113,7 +113,7 @@ router.post(
           date: req.body.date,
         },
         {
-          where: { runnerid: userId, id: req.body.id },
+          where: { runner_id: userId, id: req.body.id },
         }
       )
         .then(() => {

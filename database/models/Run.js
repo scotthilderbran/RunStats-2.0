@@ -25,7 +25,7 @@ const Run = db.define(
       type: Sequelize.DECIMAL(7, 2),
       allowNull: false,
     },
-    runnerid: {
+    runner_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
