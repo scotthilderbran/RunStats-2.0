@@ -25,8 +25,8 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log(`Server started on port:${PORT}`));
 
 db.authenticate()
-  .then(() => console.log("connected"))
-  .catch(() => console.log("Error"));
+  .then(() => console.log("Success - Connected to database"))
+  .catch(() => console.log("Error - Could not connect to database"));
 
 app.use("/user", user);
 app.use("/run", run);
