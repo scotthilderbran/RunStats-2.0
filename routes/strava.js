@@ -40,7 +40,7 @@ router.post(
                   note: runs[i].name,
                   distance: (runs[i].distance * 0.000621371192).toFixed(3),
                   time: (runs[i].moving_time / 60).toFixed(3),
-                  date: runs[0].start_date.substring(0, 10),
+                  date: runs[i].start_date.substring(0, 10),
                   strava_run_id: runs[i].id,
                 },
               });
