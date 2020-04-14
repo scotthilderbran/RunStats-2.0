@@ -29,6 +29,10 @@ const Run = db.define(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    strava_run_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true, // Model tableName will be the same as the model name

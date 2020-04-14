@@ -9,6 +9,7 @@ const cors = require("cors");
 
 const user = require("./routes/user");
 const run = require("./routes/run");
+const strava = require("./routes/strava");
 
 const passport = require("passport");
 
@@ -22,7 +23,6 @@ app.use(cors());
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`Server started on port:${PORT}`));
-console.log(process.env.DB_PASS);
 
 db.authenticate()
   .then(() => console.log("connected"))
@@ -30,3 +30,4 @@ db.authenticate()
 
 app.use("/user", user);
 app.use("/run", run);
+app.use("/strava", strava);

@@ -126,8 +126,6 @@ router.get(
         raw: true,
       })
         .then((user) => {
-          console.log("this is the user");
-          console.log(user);
           res.json({
             email: user.email,
             userFName: user.userFName,

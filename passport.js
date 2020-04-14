@@ -3,21 +3,19 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 
 const User = require("./database/models/User");
 
-module.exports = function(passport) {
+module.exports = function (passport) {
   const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("JWT"),
-    secretOrKey: process.env.AUTH_SECRET
+    secretOrKey: process.env.AUTH_SECRET,
   };
   passport.use(
     "jwt",
-    new JwtStrategy(opts, function(jwt_payload, done) {
+    new JwtStrategy(opts, function (jwt_payload, done) {
       User.findByPk(jwt_payload.id)
-        .then(user => {
-          console.log("In strat");
-          console.log(user.id);
+        .then((user) => {
           return done(null, user);
         })
-        .catch(error => {
+        .catch((error) => {
           return done(error, false);
         });
     })
