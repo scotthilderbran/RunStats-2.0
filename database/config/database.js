@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 let sequelize = null;
 
 if (process.env.DATABASE_URL) {
-  sequelize = new Sequelize(process.env.process.env.DATABASE_URL, {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: "postgres",
     protocol: "postgres",
     host: "<heroku host>",
