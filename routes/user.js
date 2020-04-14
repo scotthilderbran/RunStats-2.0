@@ -129,7 +129,7 @@ router.get(
           res.json({
             email: user.email,
             userFName: user.user_f_name,
-            userFName: user.user_l_name,
+            userLName: user.user_l_name,
             sex: user.sex,
             age: user.age,
           });
