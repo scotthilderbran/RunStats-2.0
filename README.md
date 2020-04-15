@@ -2,16 +2,18 @@
 
 Author: Scott Hilderbran
 
-NodeJS API to power RunStats Client. Server manages PostgreSQL database with user and run information.
+NodeJS API to power RunStats Client. Server manages PostgreSQL database with user and run information and handles user import from Strava.
 
 ## Technologies used
 
 - Bcrypt-nodejs
 - Express
-- JsonWebTokens
+- JWT
 - Passport
 - Sequelize
 - PostgreSQL
+- Axios
+- Strava API
 
 ## Public Endpoints
 
