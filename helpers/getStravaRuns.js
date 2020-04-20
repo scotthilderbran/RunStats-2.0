@@ -1,10 +1,12 @@
 const axios = require("axios");
 
+/* getStravaRuns.js contains helper functions to retreive and filter all of users runs */
+
 const getStravaRuns = async (accessToken, page) => {
   const config = {
     headers: { Authorization: `Bearer ${accessToken}` },
   };
-  currTime = Math.floor(new Date() / 1000);
+  currTime = Math.floor(new Date() / 1000); //Generate epoch timestamp for current datetime, gets all activity after 2010 up to current date. Activities are retreive in groups of 100.
   let res = await axios.get(
     "https://www.strava.com/api/v3/athlete/activities?before=" +
       currTime +
@@ -16,6 +18,11 @@ const getStravaRuns = async (accessToken, page) => {
   return res.data;
 };
 
+/* 
+Function to get count of total activities
+Strava doesn't have any api routes for just runs so server has to get all activities and filter.
+Function returns total count divided by 100 and rounded up.
+*/
 const getTotalCount = async (accessToken, id) => {
   const config = {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -32,20 +39,21 @@ const getTotalCount = async (accessToken, id) => {
   return count;
 };
 
+/* 
+Function to get all activities from Strava API
+*/
 const getRuns = async (accessToken, id, callback) => {
-  let count = await getTotalCount(accessToken, id);
+  let count = await getTotalCount(accessToken, id); //Get total count of all activities/100
   let runs = [];
   for (let i = 0; i < count; i++) {
-    runs.push(await getStravaRuns(accessToken, i + 1));
+    runs.push(await getStravaRuns(accessToken, i + 1)); //Get strava activities in iterations of 100
   }
-  console.log("runslengtj");
-  console.log(runs.length);
-  let newArr = [].concat.apply([], runs);
-  let out = [];
+  let newArr = [].concat.apply([], runs); //Flatten array so it is not a 2d array
   let output = newArr.filter((run) => {
+    //Filter out all non "Run" types
     return run.type === "Run";
   });
-  callback(output);
+  callback(output); //Callback function
 };
 
 module.exports = getRuns;

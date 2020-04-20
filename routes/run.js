@@ -3,9 +3,16 @@ const router = express.Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const getToken = require("../helpers/getToken");
-require("../passport")(passport);
+require("../middlewares/passport")(passport);
 const Run = require("../database/models/Run");
 
+/* 
+run.js contains all routes under /run to handle user run CRUD operations
+*/
+
+/* 
+PROTECTED - Get all runs route returns all of users runs
+*/
 router.get(
   "/getAllRuns",
   passport.authenticate("jwt", { session: false }),
@@ -37,6 +44,9 @@ router.get(
   }
 );
 
+/* 
+PROTECTED - Route to add user run
+*/
 router.post(
   "/addRun",
   passport.authenticate("jwt", { session: false }),
@@ -66,6 +76,9 @@ router.post(
   }
 );
 
+/* 
+PROTECTED - Route to delete user run
+ */
 router.post(
   "/deleteRun",
   passport.authenticate("jwt", { session: false }),
@@ -77,6 +90,7 @@ router.post(
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
       Run.destroy({
+        //Delete specified run
         where: {
           id: req.body.id,
           runner_id: userId,
@@ -94,6 +108,9 @@ router.post(
   }
 );
 
+/* 
+PROTECTED - Route to update user run
+*/
 router.post(
   "/updateRun",
   passport.authenticate("jwt", { session: false }),

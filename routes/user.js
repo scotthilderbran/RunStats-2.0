@@ -3,14 +3,19 @@ const router = express.Router();
 const User = require("../database/models/User");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-require("../passport")(passport);
+require("../middlewares/passport")(passport);
 const getToken = require("../helpers/getToken");
 
+/* User.js handles all routes under /user including registration, login, user loading, and user profile updates */
+
+/* 
+PUBLIC - User registration route
+*/
 router.post("/register", function (req, res) {
-  //Add data to find if user email exists already or not and return it
   console.log("PUBLIC - user/register POST request");
   console.log(req.body);
   if (
+    //Check if all required fields are in request body
     !req.body.email ||
     !req.body.password ||
     !req.body.fName ||
@@ -19,16 +24,19 @@ router.post("/register", function (req, res) {
     !req.body.age
   ) {
     res.status(400).send({ message: "Please enter all fields" });
-  } else if (req.body.age > 120 || req.body.age <= 0) {
+  } else if (req.body.age > 120 || req.body.age < 0) {
+    //check to see if age is between 1 and 120
     res.status(400).send({ message: "Please age range between 1 and 120" });
   } else {
     User.findOne({
+      //Check if user is already created
       where: {
         email: req.body.email,
       },
       raw: true,
     }).then((user) => {
       if (!user) {
+        //If no user is found then create user
         User.create({
           email: req.body.email.toLowerCase().replace(/\s/g, ""),
           password: req.body.password,
@@ -63,9 +71,13 @@ router.post("/register", function (req, res) {
   }
 });
 
+/* 
+PUBLIC - User login route
+*/
 router.post("/login", function (req, res) {
   console.log("PUBLIC - user/login POST request");
   if (!req.body.email || !req.body.password) {
+    //Check if email and password are included in request body
     res.status(400).send({ message: "Please enter all fields" });
   } else {
     User.findOne({
@@ -80,6 +92,7 @@ router.post("/login", function (req, res) {
           });
         }
         user.comparePassword(req.body.password, (err, isMatch) => {
+          //Function in user model to compare plaintext request password with hashed password stored in DB
           if (isMatch && !err) {
             var token = jwt.sign(
               JSON.parse(JSON.stringify(user)),
@@ -90,6 +103,7 @@ router.post("/login", function (req, res) {
               console.log(err, data);
             });
             res.json({
+              //Return success with JWT token along with user data
               success: true,
               token: "JWT " + token,
               user: {
@@ -100,6 +114,7 @@ router.post("/login", function (req, res) {
             });
           } else {
             res.status(401).send({
+              // If password doesnt match return 401
               success: false,
               message: "Authentication failed. Wrong email/password.",
             });
@@ -110,6 +125,9 @@ router.post("/login", function (req, res) {
   }
 });
 
+/* 
+PROTECTED - Route to load user data
+*/
 router.get(
   "/loadUser",
   passport.authenticate("jwt", { session: false }),
@@ -142,6 +160,9 @@ router.get(
   }
 );
 
+/* 
+PROTECTED - Route to update user information
+*/
 router.post(
   "/update",
   passport.authenticate("jwt", { session: false }),
@@ -155,13 +176,15 @@ router.post(
       console.log("decoded email");
       console.log(email);
       User.findOne({
+        // Check if user email already exists
         where: {
           email: req.body.email.toLowerCase().replace(/\s/g, ""),
         },
         raw: true,
       }).then((user) => {
         if (!user || req.body.email === email) {
-          if (req.body.age > 120 || req.body.age <= 0) {
+          if (req.body.age > 120 || req.body.age < 0) {
+            // Check that age is between 1 and 120
             res
               .status(400)
               .send({ message: "Please age range between 1 and 120" });
@@ -180,6 +203,7 @@ router.post(
               }
             )
               .then((user) => {
+                //Respond with updated user information
                 res.json({
                   email: user.email,
                   userFName: user.user_f_name,
