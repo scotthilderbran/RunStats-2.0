@@ -13,7 +13,6 @@ PUBLIC - User registration route
 */
 router.post("/register", function (req, res) {
   console.log("PUBLIC - user/register POST request");
-  console.log(req.body);
   if (
     //Check if all required fields are in request body
     !req.body.email ||
@@ -37,11 +36,13 @@ router.post("/register", function (req, res) {
     }).then((user) => {
       if (!user) {
         //If no user is found then create user
+        console.log("in registration body:");
+        console.log(req.body);
         User.create({
           email: req.body.email.toLowerCase().replace(/\s/g, ""),
           password: req.body.password,
-          userFName: req.body.fName,
-          userLName: req.body.lName,
+          user_f_name: req.body.fName,
+          user_l_name: req.body.lName,
           sex: req.body.sex,
           age: req.body.age,
         })
@@ -55,7 +56,18 @@ router.post("/register", function (req, res) {
               console.log(err, data);
             });
             console.log("User created");
-            res.json({ success: true, token: "JWT " + token });
+            res.status(201).json({
+              success: true,
+              token: "JWT " + token,
+              user: {
+                email: req.body.email.toLowerCase().replace(/\s/g, ""),
+                password: req.body.password,
+                userFName: req.body.fName,
+                userLNname: req.body.lName,
+                sex: req.body.sex,
+                age: req.body.age,
+              },
+            });
           })
           .catch((error) => {
             console.log(error);

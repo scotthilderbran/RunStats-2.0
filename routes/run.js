@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const getToken = require("../helpers/getToken");
 require("../middlewares/passport")(passport);
 const Run = require("../database/models/Run");
+const Sequelize = require("sequelize");
 
 /* 
 run.js contains all routes under /run to handle user run CRUD operations
@@ -139,6 +140,73 @@ router.post(
         })
         .catch((err) => console.log(err));
     } else {
+      return res.status(403).send({ success: false, msg: "Unauthorized." });
+    }
+  }
+);
+
+/* 
+PROTECTED - Analytics route
+*/
+router.get(
+  "/getTotals",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    console.log("PROTECTED - run/getTotals GET REQUEST");
+    console.log("dabdfkjasdjfhalksdhfkjahflkahlkfhalsdhfla");
+    var token = getToken(req.headers);
+    if (token) {
+      decoded = jwt.verify(token, process.env.AUTH_SECRET);
+      const userId = decoded.id;
+      let distanceSum;
+      let timeSum;
+      let runCount;
+      await Run.sum("distance", {
+        where: {
+          runner_id: userId,
+        },
+        raw: true,
+      })
+        .then((data) => {
+          distanceSum = data;
+        })
+        .catch((err) => {
+          console.log("Error");
+          console.log(err);
+        });
+      await Run.sum("time", {
+        where: {
+          runner_id: userId,
+        },
+        raw: true,
+      })
+        .then((data) => {
+          timeSum = data;
+        })
+        .catch((err) => {
+          console.log("Error");
+          console.log(err);
+        });
+      await Run.count({
+        where: {
+          runner_id: userId,
+        },
+        raw: true,
+      })
+        .then((data) => {
+          runCount = data;
+        })
+        .catch((err) => {
+          console.log("Error");
+          console.log(err);
+        });
+      res.status(200).json({
+        distanceSum: distanceSum,
+        timeSum: timeSum,
+        runCount: runCount,
+      });
+    } else {
+      console.log("Unauthorized");
       return res.status(403).send({ success: false, msg: "Unauthorized." });
     }
   }

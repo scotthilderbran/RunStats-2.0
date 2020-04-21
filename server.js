@@ -1,19 +1,15 @@
 require("dotenv").config({ path: __dirname + "/config.env" }); //Load enviromental variables
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const path = require("path");
-const fs = require("fs");
 const db = require("./database/config/database");
 const cors = require("cors");
-
 const user = require("./routes/user");
 const run = require("./routes/run");
 const strava = require("./routes/strava");
 
 const passport = require("passport");
 
-require("./passport");
+require("./middlewares/passport");
 
 const app = express();
 app.use(bodyParser.json());
