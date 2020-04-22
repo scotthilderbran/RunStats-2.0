@@ -6,8 +6,7 @@ const cors = require("cors");
 const user = require("./routes/user");
 const run = require("./routes/run");
 const strava = require("./routes/strava");
-
-const passport = require("passport");
+const analytic = require("./routes/analytic");
 
 require("./middlewares/passport");
 
@@ -27,3 +26,4 @@ db.authenticate()
 app.use("/user", user);
 app.use("/run", run);
 app.use("/strava", strava);
+app.use("/analytic", analytic);

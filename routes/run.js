@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const getToken = require("../helpers/getToken");
 require("../middlewares/passport")(passport);
 const Run = require("../database/models/Run");
-const sequelize = require("../database/config/database");
 
 /* 
 run.js contains all routes under /run to handle user run CRUD operations
@@ -57,6 +56,12 @@ router.post(
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
+      if (req.body.distance <= 0 || req.body.distance <= 0) {
+        return res.status(401).send({
+          success: false,
+          message: "Please enter positive values only",
+        });
+      }
       Run.create({
         note: req.body.note,
         distance: req.body.distance,
@@ -123,6 +128,12 @@ router.post(
       const userId = decoded.id;
       console.log(req.body);
       console.log(userId);
+      if (req.body.distance <= 0 || req.body.distance <= 0) {
+        return res.status(401).send({
+          success: false,
+          message: "Please enter positive values only",
+        });
+      }
       Run.update(
         {
           note: req.body.note,
@@ -140,101 +151,6 @@ router.post(
         })
         .catch((err) => console.log(err));
     } else {
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
-    }
-  }
-);
-
-/* 
-PROTECTED - Analytics route
-*/
-router.get(
-  "/getTotals",
-  passport.authenticate("jwt", { session: false }),
-  async function (req, res) {
-    console.log("PROTECTED - run/getTotals GET REQUEST");
-    console.log("dabdfkjasdjfhalksdhfkjahflkahlkfhalsdhfla");
-    var token = getToken(req.headers);
-    if (token) {
-      decoded = jwt.verify(token, process.env.AUTH_SECRET);
-      const userId = decoded.id;
-      let distanceSum;
-      let timeSum;
-      let runCount;
-      await Run.sum("distance", {
-        where: {
-          runner_id: userId,
-        },
-        raw: true,
-      })
-        .then((data) => {
-          distanceSum = data;
-        })
-        .catch((err) => {
-          console.log("Error");
-          console.log(err);
-        });
-      await Run.sum("time", {
-        where: {
-          runner_id: userId,
-        },
-        raw: true,
-      })
-        .then((data) => {
-          timeSum = data;
-        })
-        .catch((err) => {
-          console.log("Error");
-          console.log(err);
-        });
-      await Run.count({
-        where: {
-          runner_id: userId,
-        },
-        raw: true,
-      })
-        .then((data) => {
-          runCount = data;
-        })
-        .catch((err) => {
-          console.log("Error");
-          console.log(err);
-        });
-      let avgPace = timeSum / distanceSum;
-      let slowerCount;
-      let totalCount;
-      await sequelize
-        .query(
-          `select count(*) from (select u.id, (sum(r.time)/sum(r.distance)) as pace from "user" u, "run" r
-      where u.id = r.runner_id
-      group by u.id) as r
-      where r.pace > ${avgPace};`
-        )
-        .spread((results, metadata) => {
-          console.log(results[0].count);
-          slowerCount = results[0].count;
-        });
-      await Run.count({ distinct: true, col: "runner_id" }).then((data) => {
-        console.log("Output::::::");
-        console.log(data);
-        totalCount = data;
-      });
-      let pacePercentile;
-      if (slowerCount === 0) {
-        pacePercentile = 0;
-      } else {
-        pacePercentile = (slowerCount / totalCount) * 100;
-      }
-      let finalPercentile = Math.floor(pacePercentile);
-      console.log(finalPercentile);
-      res.status(200).json({
-        distanceSum: distanceSum,
-        timeSum: timeSum,
-        runCount: runCount,
-        pacePercentile: finalPercentile,
-      });
-    } else {
-      console.log("Unauthorized");
       return res.status(403).send({ success: false, msg: "Unauthorized." });
     }
   }
