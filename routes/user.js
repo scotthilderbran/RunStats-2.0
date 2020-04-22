@@ -9,6 +9,48 @@ const getToken = require("../helpers/getToken");
 /* User.js handles all routes under /user including registration, login, user loading, and user profile updates */
 
 /* 
+PRIVATE - Check auth route
+*/
+
+router.get(
+  "/authCheck",
+  passport.authenticate("jwt", { session: false }),
+  function (req, res) {
+    console.log("PROTECTED - user/loadUser GET request");
+    var token = getToken(req.headers);
+    if (token) {
+      decoded = jwt.verify(token, process.env.AUTH_SECRET);
+      const userId = decoded.id;
+      User.findOne({
+        where: {
+          id: userId,
+        },
+        raw: true,
+      })
+        .then((user) => {
+          var token = jwt.sign(
+            JSON.parse(JSON.stringify(user)),
+            process.env.AUTH_SECRET,
+            { expiresIn: 900 }
+          );
+          jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
+            console.log(err, data);
+          });
+          res.json({
+            //Return success with JWT token along with user data
+            success: true,
+            token: "JWT " + token,
+          });
+        })
+        .catch((err) => console.log(err));
+      return res.status(200);
+    } else {
+      return res.status(403).send({ success: false, msg: "User timed out" });
+    }
+  }
+);
+
+/* 
 PUBLIC - User registration route
 */
 router.post("/register", function (req, res) {
@@ -50,7 +92,7 @@ router.post("/register", function (req, res) {
             let token = jwt.sign(
               JSON.parse(JSON.stringify(user)),
               process.env.AUTH_SECRET,
-              { expiresIn: "4h" }
+              { expiresIn: 900 }
             );
             jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
               console.log(err, data);
@@ -109,7 +151,7 @@ router.post("/login", function (req, res) {
             var token = jwt.sign(
               JSON.parse(JSON.stringify(user)),
               process.env.AUTH_SECRET,
-              { expiresIn: 86400 * 30 }
+              { expiresIn: 900 }
             );
             jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
               console.log(err, data);
@@ -167,7 +209,9 @@ router.get(
         })
         .catch((err) => console.log(err));
     } else {
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res
+        .status(403)
+        .send({ success: false, msg: "Session timed out." });
     }
   }
 );

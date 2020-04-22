@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const getToken = require("../helpers/getToken");
 require("../middlewares/passport")(passport);
 const Run = require("../database/models/Run");
-const Sequelize = require("sequelize");
+const sequelize = require("../database/config/database");
 
 /* 
 run.js contains all routes under /run to handle user run CRUD operations
@@ -200,10 +200,38 @@ router.get(
           console.log("Error");
           console.log(err);
         });
+      let avgPace = timeSum / distanceSum;
+      let slowerCount;
+      let totalCount;
+      await sequelize
+        .query(
+          `select count(*) from (select u.id, (sum(r.time)/sum(r.distance)) as pace from "user" u, "run" r
+      where u.id = r.runner_id
+      group by u.id) as r
+      where r.pace > ${avgPace};`
+        )
+        .spread((results, metadata) => {
+          console.log(results[0].count);
+          slowerCount = results[0].count;
+        });
+      await Run.count({ distinct: true, col: "runner_id" }).then((data) => {
+        console.log("Output::::::");
+        console.log(data);
+        totalCount = data;
+      });
+      let pacePercentile;
+      if (slowerCount === 0) {
+        pacePercentile = 0;
+      } else {
+        pacePercentile = (slowerCount / totalCount) * 100;
+      }
+      let finalPercentile = Math.floor(pacePercentile);
+      console.log(finalPercentile);
       res.status(200).json({
         distanceSum: distanceSum,
         timeSum: timeSum,
         runCount: runCount,
+        pacePercentile: finalPercentile,
       });
     } else {
       console.log("Unauthorized");
