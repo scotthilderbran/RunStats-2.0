@@ -39,6 +39,22 @@ const slowerPaceByAll = (pace) => {
     where r.pace > ${pace};`;
 };
 
+const countOfRunnersByAgeAndSex = (ageLow, ageHigh, sex) => {
+  return `select count(distinct runner_id) 
+  from "run" r inner join "user" u on r.runner_id = u.id
+  where u.age between ${ageLow} and ${ageHigh}
+  and u.sex = ${sex}`;
+};
+
+const slowerPaceByAgeAndSex = (ageLow, ageHigh, sex, pace) => {
+  return `select count(*) from (select u.email, runner_id, (sum(time)/sum(distance)) as pace from "run" r
+  inner join "user" u on u.id=r.runner_id
+  where u.age between ${ageLow} and ${ageHigh}
+  and u.sex = ${sex}
+  group by runner_id, u.email
+  having (sum(time)/sum(distance)) > ${pace}) as outputcount`;
+};
+
 module.exports = {
   slowerPaceBySex: slowerPaceBySex,
   countOfRunnersBySex: countOfRunnersBySex,
@@ -46,4 +62,6 @@ module.exports = {
   slowerPaceByAge: slowerPaceByAge,
   countOfRunnersByAge: countOfRunnersByAge,
   slowerPaceByAll: slowerPaceByAll,
+  countOfRunnersByAgeAndSex: countOfRunnersByAgeAndSex,
+  slowerPaceByAgeAndSex: slowerPaceByAgeAndSex,
 };
