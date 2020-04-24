@@ -2,6 +2,9 @@ const Sequelize = require("sequelize");
 const db = require("../config/database");
 var bcrypt = require("bcrypt-nodejs");
 
+/**
+ * Creates User model in Sequelize for "user" table
+ */
 const User = db.define(
   "user",
   {
@@ -28,11 +31,11 @@ const User = db.define(
     },
     sex: {
       type: Sequelize.BOOLEAN,
-      allowNull: true,
+      allowNull: false,
     },
     age: {
       type: Sequelize.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
   },
   {
@@ -40,6 +43,7 @@ const User = db.define(
   }
 );
 User.beforeSave((user, options) => {
+  //if user changed password, rehash password before storing
   if (user.changed("password")) {
     user.password = bcrypt.hashSync(
       user.password,
@@ -49,6 +53,7 @@ User.beforeSave((user, options) => {
   }
 });
 User.prototype.comparePassword = function (passw, cb) {
+  //Compare hashed password with plaintext password, returns callback
   bcrypt.compare(passw, this.password, function (err, isMatch) {
     if (err) {
       return cb(err);

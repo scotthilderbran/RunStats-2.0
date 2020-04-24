@@ -1,7 +1,12 @@
 const axios = require("axios");
 
-/* getStravaRuns.js contains helper functions to retreive and filter all of users runs */
+/**
+ * getStravaRuns.js contains helper functions to retreive and filter all of users runs
+ */
 
+/**
+ * getStravaRuns function, takes in access token and page number to retrieve all activities for user in iterations of 100
+ */
 const getStravaRuns = async (accessToken, page) => {
   const config = {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -18,11 +23,10 @@ const getStravaRuns = async (accessToken, page) => {
   return res.data;
 };
 
-/* 
-Function to get count of total activities
-Strava doesn't have any api routes for just runs so server has to get all activities and filter.
-Function returns total count divided by 100 and rounded up.
-*/
+/**
+ * Function to get total count of user's Strava activity
+ * divides total by 100 to get number of pages to retrieve
+ */
 const getTotalCount = async (accessToken, id) => {
   const config = {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -39,9 +43,9 @@ const getTotalCount = async (accessToken, id) => {
   return count;
 };
 
-/* 
-Function to get all activities from Strava API
-*/
+/**
+ * Root get runs function to get all runs, flatten into single array and call callback function with final array
+ */
 const getRuns = async (accessToken, id, callback) => {
   let count = await getTotalCount(accessToken, id); //Get total count of all activities/100
   let runs = [];

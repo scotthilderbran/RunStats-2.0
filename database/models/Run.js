@@ -1,6 +1,9 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 
+/**
+ * Creates run model in Sequelize for "run" table
+ */
 const Run = db.define(
   "run",
   {
@@ -19,7 +22,7 @@ const Run = db.define(
     },
     date: {
       type: Sequelize.DATEONLY,
-      allowNull: true,
+      allowNull: false,
     },
     time: {
       type: Sequelize.DECIMAL(7, 2),

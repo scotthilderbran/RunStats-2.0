@@ -30,6 +30,19 @@ const getTotalCountByAgeAndSexMarathon =
 const slowerCountByAgeAndSexMarathon =
   marathonQueries.slowerCountByAgeAndSexMarathon;
 
+/**
+ * analytic.js contains all routes under /analytic to return totals and benchmarks to user
+ */
+
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [get] /analytic/getTotals
+ * description: "Returns percentiles compared to RunStats users and Boston Marathon runners along with user totals"
+ * responses:
+ *    200: JSON object of all totals/benchmarks
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
+ */
 router.get(
   "/getTotals",
   passport.authenticate("jwt", { session: false }),
@@ -67,6 +80,11 @@ router.get(
           pace = results[0].pace;
           distanceSum = results[0].distance;
           timeSum = results[0].time;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let slowerCountBySex;
       let totalCountBySex;
@@ -74,11 +92,21 @@ router.get(
         .query(slowerPaceBySex(decoded.sex, pace))
         .spread((results, metadata) => {
           slowerCountBySex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(countOfRunnersBySex(decoded.sex))
         .spread((results, metadata) => {
           totalCountBySex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let slowerCountByAge;
       let totalCountByAge;
@@ -86,11 +114,21 @@ router.get(
         .query(slowerPaceByAge(ageLow, ageHigh, pace))
         .spread((results, metadata) => {
           slowerCountByAge = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(countOfRunnersByAge(ageLow, ageHigh, pace))
         .spread((results, metadata) => {
           totalCountByAge = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let runCount;
       await Run.count({
@@ -103,8 +141,9 @@ router.get(
           runCount = data;
         })
         .catch((err) => {
-          console.log("Error");
+          console.log("Sever error:");
           console.log(err);
+          return res.status(500).send(err);
         });
       let slowerCountByAll;
       let totalCountByAll;
@@ -112,6 +151,11 @@ router.get(
         .query(slowerPaceByAll(pace))
         .spread((results, metadata) => {
           slowerCountByAll = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let slowerCountByAgeAndSex;
       let totalCountByAgeAndSex;
@@ -119,15 +163,31 @@ router.get(
         .query(slowerPaceByAgeAndSex(ageLow, ageHigh, decoded.sex, pace))
         .spread((results, metadata) => {
           slowerCountByAgeAndSex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(countOfRunnersByAgeAndSex(ageLow, ageHigh, decoded.sex))
         .spread((results, metadata) => {
           totalCountByAgeAndSex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
-      await Run.count({ distinct: true, col: "runner_id" }).then((data) => {
-        totalCountByAll = data;
-      });
+      await Run.count({ distinct: true, col: "runner_id" })
+        .then((data) => {
+          totalCountByAll = data;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
+        });
       let finalPercentileByAll = Math.floor(
         percentileCheck(slowerCountByAll, totalCountByAll)
       );
@@ -148,11 +208,21 @@ router.get(
         .query(getSlowerCountPaceMarathon(pace))
         .spread((results, metadata) => {
           marathonTotalSlowerCount = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(getTotalCountMarathon())
         .spread((results, metadata) => {
           marathonTotalCount = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let marathonTotalCountBySex;
       let marathonTotalSlowerCountBySex;
@@ -160,11 +230,21 @@ router.get(
         .query(slowerCountBySexMarathon(decoded.sex, pace))
         .spread((results, metadata) => {
           marathonTotalSlowerCountBySex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(getTotalCountBySexMarathon(decoded.sex))
         .spread((results, metadata) => {
           marathonTotalCountBySex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let marathonTotalCountByAge;
       let marathonTotalSlowerCountByAge;
@@ -172,6 +252,11 @@ router.get(
         .query(slowerCountByAgeMarathon(ageLow, ageHigh, pace))
         .spread((results, metadata) => {
           marathonTotalSlowerCountByAge = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(getTotalCountByAgeMarathon(ageLow, ageHigh))
@@ -179,6 +264,11 @@ router.get(
           marathonTotalCountByAge = results[0].count;
           console.log("getTotals marathon by agedadafsadfasdfa");
           console.log(results);
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let marathonTotalCountByAgeAndSex;
       let marathonTotalSlowerCountByAgeAndSex;
@@ -188,11 +278,21 @@ router.get(
         )
         .spread((results, metadata) => {
           marathonTotalSlowerCountByAgeAndSex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       await sequelize
         .query(getTotalCountByAgeAndSexMarathon(ageLow, ageHigh, decoded.sex))
         .spread((results, metadata) => {
           marathonTotalCountByAgeAndSex = results[0].count;
+        })
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
         });
       let finalPercentileByAllMarathon = Math.floor(
         percentileCheck(marathonTotalSlowerCount, marathonTotalCount)
@@ -209,7 +309,7 @@ router.get(
           marathonTotalCountByAgeAndSex
         )
       );
-      res.status(200).json({
+      return res.status(200).json({
         distanceSum: distanceSum,
         timeSum: timeSum,
         runCount: runCount,
@@ -226,8 +326,7 @@ router.get(
         ageHigh: ageHigh,
       });
     } else {
-      console.log("Unauthorized");
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );

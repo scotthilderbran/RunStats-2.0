@@ -1,7 +1,6 @@
-/* 
-Helper function to retreive jwt from request headers
-*/
-
+/**
+ * Helper function to retreive jwt from request headers
+ */
 const getToken = (headers) => {
   if (headers && headers.authorization) {
     var parted = headers.authorization.split(" ");

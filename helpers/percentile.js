@@ -1,3 +1,6 @@
+/**
+ * percentileCheck returns final percentile, returns 100 if only 1 total runner and 0 if slower count is 0
+ */
 const percentileCheck = (slowerCount, totalCount) => {
   console.log("In percentile check");
   if (slowerCount == 0) {

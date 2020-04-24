@@ -6,53 +6,21 @@ const passport = require("passport");
 require("../middlewares/passport")(passport);
 const getToken = require("../helpers/getToken");
 
-/* User.js handles all routes under /user including registration, login, user loading, and user profile updates */
+/**
+ * User.js handles all routes under /user including registration, login, user loading, and user profile updates
+ */
 
-/* 
-PRIVATE - Check auth route
-*/
+/**
+ * PUBLIC
+ * @api [post] /user/register
+ * description: "Register's user in RunStats database"
+ * body: JSON object including {email, password, fName, lName, sex, age}
+ * responses:
+ *    201: User registered - responds with valid JWT
+ *    400: Missing fields, fields out of range, or email already in use
+ *    500: Internal server error
+ */
 
-router.get(
-  "/authCheck",
-  passport.authenticate("jwt", { session: false }),
-  function (req, res) {
-    console.log("PROTECTED - user/loadUser GET request");
-    var token = getToken(req.headers);
-    if (token) {
-      decoded = jwt.verify(token, process.env.AUTH_SECRET);
-      const userId = decoded.id;
-      User.findOne({
-        where: {
-          id: userId,
-        },
-        raw: true,
-      })
-        .then((user) => {
-          var token = jwt.sign(
-            JSON.parse(JSON.stringify(user)),
-            process.env.AUTH_SECRET,
-            { expiresIn: 900 }
-          );
-          jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
-            console.log(err, data);
-          });
-          res.json({
-            //Return success with JWT token along with user data
-            success: true,
-            token: "JWT " + token,
-          });
-        })
-        .catch((err) => console.log(err));
-      return res.status(200);
-    } else {
-      return res.status(403).send({ success: false, msg: "User timed out" });
-    }
-  }
-);
-
-/* 
-PUBLIC - User registration route
-*/
 router.post("/register", function (req, res) {
   console.log("PUBLIC - user/register POST request");
   if (
@@ -99,7 +67,6 @@ router.post("/register", function (req, res) {
             });
             console.log("User created");
             res.status(201).json({
-              success: true,
               token: "JWT " + token,
               user: {
                 email: req.body.email.toLowerCase().replace(/\s/g, ""),
@@ -111,13 +78,13 @@ router.post("/register", function (req, res) {
               },
             });
           })
-          .catch((error) => {
-            console.log(error);
-            res.status(400).send(error);
+          .catch((err) => {
+            console.log("Sever error:");
+            console.log(err);
+            res.status(500).send(err);
           });
       } else {
-        res.status(401).send({
-          success: false,
+        res.status(400).send({
           message: "Please login, email already in use",
         });
       }
@@ -125,9 +92,18 @@ router.post("/register", function (req, res) {
   }
 });
 
-/* 
-PUBLIC - User login route
-*/
+/**
+ * PUBLIC
+ * @api [post] /user/login
+ * description: "login user to RunStats"
+ * body: JSON object including {email, password}
+ * responses:
+ *    200: User logged in, returns valid JWT
+ *    400: Missing fields, fields out of range
+ *    401: User not found/wrong email password
+ *    500: Internal server error
+ */
+
 router.post("/login", function (req, res) {
   console.log("PUBLIC - user/login POST request");
   if (!req.body.email || !req.body.password) {
@@ -156,9 +132,8 @@ router.post("/login", function (req, res) {
             jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
               console.log(err, data);
             });
-            res.json({
+            res.status(200).json({
               //Return success with JWT token along with user data
-              success: true,
               token: "JWT " + token,
               user: {
                 email: user.email,
@@ -169,19 +144,74 @@ router.post("/login", function (req, res) {
           } else {
             res.status(401).send({
               // If password doesnt match return 401
-              success: false,
               message: "Authentication failed. Wrong email/password.",
             });
           }
         });
       })
-      .catch((error) => res.status(400).send(error));
+      .catch((err) => {
+        console.log("Sever error:");
+        console.log(err);
+        res.status(500).send(err);
+      });
   }
 });
 
-/* 
-PROTECTED - Route to load user data
-*/
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [get] /user/authCheck
+ * description: "Verify current JWT and return refreshed JWT"
+ * responses:
+ *    200: Valid JWT returns refreshed JWT
+ *    401: Invalid JWT, user session timed out
+ */
+
+router.get(
+  "/authCheck",
+  passport.authenticate("jwt", { session: false }),
+  function (req, res) {
+    console.log("PROTECTED - user/loadUser GET request");
+    var token = getToken(req.headers);
+    if (token) {
+      decoded = jwt.verify(token, process.env.AUTH_SECRET);
+      const userId = decoded.id;
+      User.findOne({
+        where: {
+          id: userId,
+        },
+        raw: true,
+      })
+        .then((user) => {
+          var token = jwt.sign(
+            JSON.parse(JSON.stringify(user)),
+            process.env.AUTH_SECRET,
+            { expiresIn: 900 }
+          );
+          jwt.verify(token, process.env.AUTH_SECRET, function (err, data) {
+            console.log(err, data);
+          });
+          return res.status(200).json({
+            //Return success with JWT token along with user data
+            token: "JWT " + token,
+          });
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return res.status(401).send({ msg: "User timed out" });
+    }
+  }
+);
+
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [get] /user/loadUser
+ * description: "Load user information"
+ * responses:
+ *    200: Returns user information
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
+ */
+
 router.get(
   "/loadUser",
   passport.authenticate("jwt", { session: false }),
@@ -198,27 +228,37 @@ router.get(
         raw: true,
       })
         .then((user) => {
-          res.json({
+          return res.status(200).json({
             email: user.email,
             userFName: user.user_f_name,
             userLName: user.user_l_name,
             sex: user.sex,
             age: user.age,
           });
-          res.status(200);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
+        });
     } else {
-      return res
-        .status(403)
-        .send({ success: false, msg: "Session timed out." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );
 
-/* 
-PROTECTED - Route to update user information
-*/
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [post] /user/update
+ * description: "Updates user information"
+ * body: JSON object including {email, password, fName, lName, sex, age}
+ * responses:
+ *    200: User updated
+ *    400: Email already in use or age out of range
+ *    401: Invalid JWT, unauthorized.
+ *    500: Internal server error
+ */
+
 router.post(
   "/update",
   passport.authenticate("jwt", { session: false }),
@@ -260,26 +300,28 @@ router.post(
             )
               .then((user) => {
                 //Respond with updated user information
-                res.json({
+                return res.status(200).json({
                   email: user.email,
                   userFName: user.user_f_name,
                   userLName: user.user_l_name,
                   sex: user.sex,
                   age: user.age,
                 });
-                res.status(200);
               })
-              .catch((err) => console.log(err));
+              .catch((err) => {
+                console.log("Sever error:");
+                console.log(err);
+                res.status(500).send(err);
+              });
           }
         } else {
-          res.status(401).send({
-            success: false,
+          res.status(400).send({
             message: "Email already in use",
           });
         }
       });
     } else {
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );

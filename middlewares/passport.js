@@ -2,9 +2,9 @@ const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("../database/models/User");
 
-/* 
-Middleware function to authenticate user based off request JWT
-*/
+/**
+ * Middleware function to authenticate user based off request JWT
+ */
 
 module.exports = function (passport) {
   const opts = {

@@ -8,26 +8,23 @@ const axios = require("axios");
 const getRuns = require("../helpers/getStravaRuns");
 const Run = require("../database/models/Run");
 
-/* strava.js handles all routes under /strava, mainly the token exchange */
+/**
+ * strava.js handles all routes under /strava, mainly the token exchange
+ */
 
-/* 
-PROTECTED - Strava token exchange route.
-1. User clicks import from strava in client
-2. User is redirected to strava OAuth page and client callback url once complete
-3. Client checks to make sure relevant permissions are granted
-4. Client sends user's unique Strava authorization code to this route
-5. Server exchanges auth code for temporary access token
-6. Access token is used in ./helpers/getStravaRuns.js to retreive user's runs
-*/
-
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [post] /strava/stravaImport
+ * description: "Exchanges Strava token and imports runs"
+ * responses:
+ *    200: Strava runs imported
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
+ */
 router.post(
-  "/stravaTokenExchange",
+  "/stravaImport",
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
-    console.log("Strava Token Exchange");
-    console.log("Strava Token Exchange");
-    console.log("Strava Token Exchange");
-    console.log(req.body.code);
     var token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
@@ -62,12 +59,13 @@ router.post(
           });
         })
         .catch((err) => {
+          console.log("Sever error:");
           console.log(err);
+          return res.status(500).send(err);
         });
       return res.sendStatus(200);
     } else {
-      console.log("Unauthorized");
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized." });
     }
   }
 );

@@ -2,6 +2,10 @@ const Sequelize = require("sequelize");
 
 let sequelize = null;
 
+/**
+ * Creates new database object and initializes connection to database
+ * uses local dev database connection if in local dev enviroment otherwises uses Heroku database
+ */
 if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: "postgres",

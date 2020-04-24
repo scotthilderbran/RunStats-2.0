@@ -6,13 +6,19 @@ const getToken = require("../helpers/getToken");
 require("../middlewares/passport")(passport);
 const Run = require("../database/models/Run");
 
-/* 
-run.js contains all routes under /run to handle user run CRUD operations
-*/
+/**
+ * run.js contains all routes under /run to handle user run CRUD operations
+ */
 
-/* 
-PROTECTED - Get all runs route returns all of users runs
-*/
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [get] /run/getAllRuns
+ * description: "Load all user runs"
+ * responses:
+ *    200: JSON object of all runs
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
+ */
 router.get(
   "/getAllRuns",
   passport.authenticate("jwt", { session: false }),
@@ -29,24 +35,30 @@ router.get(
         raw: true,
       })
         .then((run) => {
-          res.json(run);
-          res.status(200);
-          console.log("getAllRuns response sent");
+          return res.status(200).json(run);
         })
         .catch((err) => {
-          console.log("Error");
+          console.log("Sever error:");
           console.log(err);
+          return res.status(500).send(err);
         });
     } else {
-      console.log("Unauthorized");
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );
 
-/* 
-PROTECTED - Route to add user run
-*/
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [post] /run/addRun
+ * description: "Add run for user"
+ * body: JSON object {note, distance, time, date}
+ * responses:
+ *    201: Run added
+ *    400: Distance or time out of range
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
+ */
 router.post(
   "/addRun",
   passport.authenticate("jwt", { session: false }),
@@ -56,9 +68,12 @@ router.post(
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
-      if (req.body.distance <= 0 || req.body.distance <= 0) {
-        return res.status(401).send({
-          success: false,
+      if (
+        req.body.distance <= 0 ||
+        req.body.distance <= 0 ||
+        req.body.time <= 0
+      ) {
+        return res.status(400).send({
           message: "Please enter positive values only",
         });
       }
@@ -69,22 +84,31 @@ router.post(
         date: req.body.date,
         runner_id: userId,
       })
-        .then((run) => {
-          console.log("Adding following run:");
-          console.log(run);
-          res.status(200).send("Run added");
+        .then(() => {
+          return res.sendStatus(201);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
+        });
     } else {
-      console.log("Unauthorized");
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );
 
-/* 
-PROTECTED - Route to delete user run
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [post] /run/deleteRun
+ * description: "Delete run for user"
+ * body: JSON object {id} (run id to delete)
+ * responses:
+ *    200: Run deleted
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
  */
+
 router.post(
   "/deleteRun",
   passport.authenticate("jwt", { session: false }),
@@ -103,20 +127,31 @@ router.post(
         },
       })
         .then(() => {
-          console.log("Run Deleted:");
-          res.status(200).send("Run deleted");
+          return res.sendStatus(200);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
+        });
     } else {
-      console.log("Unauthorized");
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );
 
-/* 
-PROTECTED - Route to update user run
-*/
+/**
+ * PRIVATE - REQUIRES JWT IN HEADER
+ * @api [get] /run/updateRun
+ * description: "Update run for user"
+ * body: {note, distance, time, date}
+ * responses:
+ *    200: Run updated
+ *    400: Distance or time out of range
+ *    401: Invalid JWT, unauthorized
+ *    500: Internal server error
+ */
+
 router.post(
   "/updateRun",
   passport.authenticate("jwt", { session: false }),
@@ -128,9 +163,8 @@ router.post(
       const userId = decoded.id;
       console.log(req.body);
       console.log(userId);
-      if (req.body.distance <= 0 || req.body.distance <= 0) {
-        return res.status(401).send({
-          success: false,
+      if (req.body.distance <= 0 || req.body.distance <= 0 || time <= 0) {
+        return res.status(400).send({
           message: "Please enter positive values only",
         });
       }
@@ -146,12 +180,15 @@ router.post(
         }
       )
         .then(() => {
-          console.log("here");
-          res.sendStatus(200);
+          return res.sendStatus(200);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log("Sever error:");
+          console.log(err);
+          return res.status(500).send(err);
+        });
     } else {
-      return res.status(403).send({ success: false, msg: "Unauthorized." });
+      return res.status(401).send({ message: "Unauthorized" });
     }
   }
 );
