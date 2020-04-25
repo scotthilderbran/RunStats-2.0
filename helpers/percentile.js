@@ -7,9 +7,12 @@ const percentileCheck = (slowerCount, totalCount) => {
     if (totalCount == 1) {
       return 100;
     } else {
+      console.log("Perentile output 0;");
       return 0;
     }
   } else {
+    console.log("Perentile check output;");
+    console.log((slowerCount / totalCount) * 100);
     return (slowerCount / totalCount) * 100;
   }
 };

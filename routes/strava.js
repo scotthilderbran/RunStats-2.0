@@ -24,12 +24,12 @@ const Run = require("../database/models/Run");
 router.post(
   "/stravaImport",
   passport.authenticate("jwt", { session: false }),
-  function (req, res) {
+  async function (req, res) {
     var token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
-      axios //Get access token for user using client id, client secret, and users auth code
+      await axios //Get access token for user using client id, client secret, and users auth code
         .post(
           "https://www.strava.com/oauth/token?client_id=" +
             process.env.STRAVA_CLIENT_ID +

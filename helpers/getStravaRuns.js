@@ -57,6 +57,7 @@ const getRuns = async (accessToken, id, callback) => {
     //Filter out all non "Run" types
     return run.type === "Run";
   });
+  console.log(output);
   callback(output); //Callback function
 };
 
