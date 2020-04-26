@@ -139,6 +139,8 @@ router.post("/login", function (req, res) {
                 email: user.email,
                 userFName: user.user_f_name,
                 userLName: user.user_l_name,
+                sex: user.sex,
+                age: user.age,
               },
             });
           } else {
