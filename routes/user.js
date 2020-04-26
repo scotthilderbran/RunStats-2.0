@@ -23,13 +23,13 @@ const getToken = require("../helpers/getToken");
 
 router.post("/register", function (req, res) {
   console.log("PUBLIC - user/register POST request");
+  console.log(req.body);
   if (
     //Check if all required fields are in request body
     !req.body.email ||
     !req.body.password ||
     !req.body.fName ||
     !req.body.lName ||
-    !req.body.sex ||
     !req.body.age
   ) {
     res.status(400).send({ message: "Please enter all fields" });
