@@ -163,7 +163,11 @@ router.post(
       const userId = decoded.id;
       console.log(req.body);
       console.log(userId);
-      if (req.body.distance <= 0 || req.body.distance <= 0 || time <= 0) {
+      if (
+        req.body.distance <= 0 ||
+        req.body.distance <= 0 ||
+        req.body.time <= 0
+      ) {
         return res.status(400).send({
           message: "Please enter positive values only",
         });
