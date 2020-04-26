@@ -72,7 +72,7 @@ router.post("/register", function (req, res) {
                 email: req.body.email.toLowerCase().replace(/\s/g, ""),
                 password: req.body.password,
                 userFName: req.body.fName,
-                userLNname: req.body.lName,
+                userLName: req.body.lName,
                 sex: req.body.sex,
                 age: req.body.age,
               },
