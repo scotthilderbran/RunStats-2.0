@@ -24,7 +24,7 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
     console.log("PROTECTED - run/getAllRuns GET REQUEST");
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
@@ -64,7 +64,7 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
     console.log("PROTECTED - run/addRun POST request");
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
@@ -115,7 +115,7 @@ router.post(
   function (req, res) {
     console.log("PROTECTED - run/deleteRun POST request");
     console.log(req.body.id);
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
@@ -157,7 +157,7 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
     console.log("PROTECTED - run/updateRun POST request");
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;

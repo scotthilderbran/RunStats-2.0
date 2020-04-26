@@ -6,12 +6,13 @@ let sequelize = null;
  * Creates new database object and initializes connection to database
  * uses local dev database connection if in local dev enviroment otherwises uses Heroku database
  */
+
 if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: "postgres",
     protocol: "postgres",
     host: "<heroku host>",
-    logging: true, //false
+    logging: true,
   });
 } else {
   sequelize = new Sequelize(
@@ -19,7 +20,7 @@ if (process.env.DATABASE_URL) {
     "postgres",
     process.env.DB_PASS,
     {
-      host: process.env.DB_HOST,
+      host: process.env.DB_HOST, //DB host is only stored in dev enviroment
       dialect: "postgres",
       operatorsAliases: false,
 

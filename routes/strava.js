@@ -25,7 +25,7 @@ router.post(
   "/stravaImport",
   passport.authenticate("jwt", { session: false }),
   async function (req, res) {
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;

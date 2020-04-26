@@ -9,11 +9,12 @@ const User = require("../database/models/User");
 module.exports = function (passport) {
   const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("JWT"),
-    secretOrKey: process.env.AUTH_SECRET,
+    secretOrKey: process.env.AUTH_SECRET, //enviroment variable auth secret.
   };
   passport.use(
     "jwt",
     new JwtStrategy(opts, function (jwt_payload, done) {
+      console.log("in jwt strategy");
       User.findByPk(jwt_payload.id) //Check if user
         .then((user) => {
           return done(null, user);

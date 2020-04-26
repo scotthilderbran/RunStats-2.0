@@ -1,10 +1,6 @@
 const axios = require("axios");
 
 /**
- * getStravaRuns.js contains helper functions to retreive and filter all of users runs
- */
-
-/**
  * getStravaRuns function, takes in access token and page number to retrieve all activities for user in iterations of 100
  */
 const getStravaRuns = async (accessToken, page) => {

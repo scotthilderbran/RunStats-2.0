@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../database/models/User");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-require("../middlewares/passport")(passport);
+//require("../middlewares/passport")(passport);
 const getToken = require("../helpers/getToken");
 
 /**
@@ -124,7 +124,7 @@ router.post("/login", function (req, res) {
         user.comparePassword(req.body.password, (err, isMatch) => {
           //Function in user model to compare plaintext request password with hashed password stored in DB
           if (isMatch && !err) {
-            var token = jwt.sign(
+            let token = jwt.sign(
               JSON.parse(JSON.stringify(user)),
               process.env.AUTH_SECRET,
               { expiresIn: 900 }
@@ -171,7 +171,7 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
     console.log("PROTECTED - user/loadUser GET request");
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
@@ -182,7 +182,7 @@ router.get(
         raw: true,
       })
         .then((user) => {
-          var token = jwt.sign(
+          let token = jwt.sign(
             JSON.parse(JSON.stringify(user)),
             process.env.AUTH_SECRET,
             { expiresIn: 900 }
@@ -217,7 +217,7 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
     console.log("PROTECTED - user/loadUser GET request");
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
@@ -264,7 +264,7 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   function (req, res) {
     console.log("PROTECTED - user/update POST request");
-    var token = getToken(req.headers);
+    let token = getToken(req.headers);
     if (token) {
       decoded = jwt.verify(token, process.env.AUTH_SECRET);
       const userId = decoded.id;
