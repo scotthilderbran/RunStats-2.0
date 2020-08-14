@@ -1,4 +1,4 @@
-# RunStats 2.0 Backend
+# <img width="40" alt="" align="center" src="https://user-images.githubusercontent.com/45612321/90285373-665b8f00-de39-11ea-956e-4f440a7445b0.png"> RunStats 2.0 Back end
 
 Author: Scott Hilderbran
 
